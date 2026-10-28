@@ -610,8 +610,9 @@ async function makeCard() {
 
   const kind = S.mode === 'slow' || S.mode === 'retired' ? 'field' : 'town';
   const snap = PX.snapshot({ world: S.W.id, kind, seed: seedOf(), hero: heroLook(30), partners: S.loves.filter(l => l.wed !== null && l.st !== 'left').slice(0, 4).map(partnerLook) }, 5);
-  c.drawImage(snap, 60, 60);
-  c.strokeStyle = '#2a3248'; c.lineWidth = 4; c.strokeRect(60, 60, snap.width, snap.height);
+  const sx = Math.round((W - snap.width) / 2);
+  c.drawImage(snap, sx, 60);
+  c.strokeStyle = '#2a3248'; c.lineWidth = 4; c.strokeRect(sx, 60, snap.width, snap.height);
 
   c.textAlign = 'center';
   const put = (t, font, col, y) => { c.font = font; c.fillStyle = col; c.fillText(t, W / 2, y); };
