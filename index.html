@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ล้านโลก หนึ่งชีวิต</title>
+  <meta name="description" content="เกมจำลองชีวิตเกิดใหม่ต่างโลก เลือกโลกหรือให้โชคชะตาเลือก สุ่มสกิล เลือกอาชีพ แล้วใช้ชีวิตใหม่ที่มีเพียงครั้งเดียวจนถึงที่สุด">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== หน้าแรก ===== -->
+  <section id="home" class="screen active">
+    <header class="hero">
+      <div class="hero-txt">
+      <div class="ver">v0.2 beta · เกมจำลองชีวิตต่างโลก · 7 โลก · เล่นฟรี</div>
+      <h1><span class="one">ล้านโลก</span><br>หนึ่งชีวิต<small>ตายแล้วเกิดใหม่ ทั้งทีขอเลือกโลกเองได้ไหม</small></h1>
+      <p class="lead">คุณตายแล้ว เทพธิดายื่นมือมาตรงหน้าและเสนอชีวิตใหม่ในต่างโลก จะเลือกโลกเองก็ได้ หรือจะฝากชะตาไว้กับโชคเพื่อรับพรที่ดีกว่า ทุกชีวิตมีเพียงครั้งเดียว ใช้มันให้ถึงที่สุด</p>
+      </div>
+      <figure class="hero-scene"><canvas id="homeScene" class="scene"></canvas><figcaption id="homeCap"></figcaption></figure>
+    </header>
+
+    <h2 class="sec">โลกที่จะไปเกิด</h2>
+    <div id="worlds" class="worlds"></div>
+
+    <div class="settings">
+      <div class="set">
+        <div class="set-l">ความยาวของหนึ่งชีวิต</div>
+        <div class="seg" id="lenSeg">
+          <button data-len="3">ราว 3 นาที</button>
+          <button data-len="6" class="on">ราว 6 นาที</button>
+          <button data-len="12">ราว 12 นาที</button>
+        </div>
+        <p class="hint">ระหว่างใช้ชีวิตหยุดชั่วคราวหรือเร่งความเร็วได้ เมื่อมีเรื่องสำคัญ เวลาจะหยุดรอให้คุณตัดสินใจ</p>
+      </div>
+    </div>
+
+    <div class="born-wrap">
+      <button id="btnBorn" class="cta">ตาย แล้วเกิดใหม่</button>
+      <p class="hint" id="bornHint"></p>
+    </div>
+
+    <section class="memorial-sec">
+      <h2 class="sec">อนุสรณ์แห่งชีวิตที่ผ่านมา</h2>
+      <p class="hint">ชีวิตที่คุณบันทึกไว้ เก็บอยู่ในเบราว์เซอร์นี้เท่านั้น</p>
+      <div id="memorial" class="memorial"></div>
+    </section>
+
+    <footer class="foot">เนื้อหามีการต่อสู้และความตายในโลกสมมติ · ทุกเหตุการณ์เป็นเรื่องแต่ง</footer>
+  </section>
+
+  <!-- ===== พรจากเทพธิดา ===== -->
+  <section id="bless" class="screen">
+    <div class="bless-wrap">
+      <canvas id="blessScene" class="scene bless-scene"></canvas>
+      <div id="blessLines" class="bless-lines"></div>
+      <div id="rollCards" class="cards"></div>
+      <div class="bless-actions">
+        <button id="btnSkip" class="ghost">ข้าม ▸▸</button>
+        <button id="btnToBuild" class="cta hidden">ต่อไป: เลือกอาชีพ →</button>
+      </div>
+      <details class="odds">
+        <summary>อัตราการสุ่มสกิล</summary>
+        <div id="oddsTable"></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ===== สร้างตัวละคร ===== -->
+  <section id="build" class="screen">
+    <div class="build-wrap">
+      <div id="fateBar" class="fate-bar"></div>
+
+      <div class="panel who">
+        <canvas id="buildScene" class="scene"></canvas>
+        <div class="who-r">
+          <h3>ชื่อในโลกใหม่</h3>
+          <div class="name-row">
+            <input id="nameInput" maxlength="32" autocomplete="off">
+            <button id="btnName" class="ghost" title="สุ่มชื่อใหม่">🎲</button>
+          </div>
+          <button id="btnLook" class="ghost sm" style="margin-top:10px">สุ่มหน้าตาใหม่</button>
+          <p class="hint">ภาพตัวละครจะเปลี่ยนไปตามวัย อาชีพ และระดับที่ไต่ขึ้นไป</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>อาชีพ <span class="muted">— จะไปสายไหน</span></h3>
+        <div id="classGrid" class="class-grid"></div>
+      </div>
+
+      <div class="panel">
+        <h3>เส้นทางชีวิต <span class="muted">— ชาตินี้ตั้งใจจะใช้ชีวิตแบบไหน</span></h3>
+        <div id="pathGrid" class="class-grid path-grid"></div>
+      </div>
+
+      <div class="panel">
+        <h3>ค่าสถานะ <span class="muted">— แต้มที่ลงจะกำหนดทิศทางการเติบโตตลอดชีวิตด้วย</span></h3>
+        <div class="alloc-top">
+          <div>แต้มคงเหลือ <b id="ptsLeft">0</b></div>
+          <div class="presets">
+            <button class="ghost sm" data-preset="class">ตามอาชีพ</button>
+            <button class="ghost sm" data-preset="balance">สมดุล</button>
+            <button class="ghost sm" data-preset="luck">เทหมดหน้าตัก (โชค)</button>
+            <button class="ghost sm" data-preset="reset">ล้าง</button>
+          </div>
+        </div>
+        <div id="allocRows" class="alloc-rows"></div>
+        <div id="preview" class="preview"></div>
+      </div>
+
+      <button id="btnStart" class="cta">เริ่มชีวิตใหม่</button>
+    </div>
+  </section>
+
+  <!-- ===== ใช้ชีวิต ===== -->
+  <section id="life" class="screen">
+    <!-- ทั้งหน้าจอล็อกไว้ ไม่เลื่อนทั้งหน้า มีเพียงบันทึกชีวิตที่เลื่อนในกรอบของตัวเอง -->
+    <div class="life-app">
+      <div class="life-top">
+        <div class="age-box"><span id="ageNum">0</span><small>ปี</small></div>
+        <div class="speed" id="speedSeg">
+          <button data-sp="0" title="หยุด (Space)" aria-label="หยุด">⏸</button>
+          <button data-sp="1" class="on">×1</button>
+          <button data-sp="2">×2</button>
+          <button data-sp="5">×5</button>
+          <button data-sp="25" aria-label="เร่งสุด">⏭</button>
+        </div>
+        <button id="btnSheet" class="ghost sm sheet-btn">📋 สถานะ</button>
+        <div class="yr-bar"><div id="yrFill"></div></div>
+      </div>
+      <canvas id="lifeScene" class="scene life-scene"></canvas>
+      <div id="mini" class="mini"></div>
+      <div id="sheet" class="sheet"></div>
+      <div class="log-wrap">
+        <div id="log" class="log"></div>
+        <button id="btnLatest" class="latest hidden">⬇ ไปปีล่าสุด</button>
+      </div>
+    </div>
+    <div id="sheetBack" class="sheet-back hidden"></div>
+
+    <div id="choice" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-box">
+        <div class="modal-age" id="chAge"></div>
+        <h3 id="chTitle"></h3>
+        <p id="chText"></p>
+        <div id="chOpts" class="ch-opts"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== จบชีวิต ===== -->
+  <section id="end" class="screen">
+    <div class="end-wrap">
+      <div class="tomb">
+        <canvas id="endScene" class="scene end-scene"></canvas>
+        <div class="tomb-title" id="endTitle"></div>
+        <h2 id="endName"></h2>
+        <div class="tomb-sub" id="endSub"></div>
+        <div class="onein" id="endOneIn"></div>
+        <p class="bio" id="endBio"></p>
+        <div id="endAch" class="ach"></div>
+        <div id="endStats" class="end-stats"></div>
+        <details class="decisions">
+          <summary>ทางแยกที่เคยเลือก</summary>
+          <ol id="endChoices"></ol>
+        </details>
+        <label class="epi-l" for="epitaph">ถ้อยคำสุดท้ายถึงชีวิตนี้</label>
+        <input id="epitaph" maxlength="60" placeholder="เช่น ชาตินี้คุ้มแล้ว">
+        <div class="card-box">
+          <img id="cardImg" alt="การ์ดสรุปชีวิตสำหรับแชร์">
+          <div class="end-actions">
+            <button id="btnCard" class="ghost">⬇ ดาวน์โหลดการ์ด</button>
+            <button id="btnShare" class="ghost hidden">↗ แชร์การ์ด</button>
+          </div>
+        </div>
+        <div class="end-actions">
+          <button id="btnSave" class="cta">จารึกลงอนุสรณ์</button>
+          <button id="btnCopy" class="ghost">คัดลอกเรื่องราว</button>
+          <button id="btnAgain" class="ghost">เกิดใหม่อีกครั้ง</button>
+        </div>
+        <p class="hint" id="endMsg"></p>
+      </div>
+    </div>
+  </section>
+
+</div>
+<button id="sndBtn" class="snd" title="เปิด/ปิดเสียง" aria-label="เปิดหรือปิดเสียง">🔊</button>
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/pixel.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
