@@ -589,10 +589,21 @@ function agingCheck() {
 }
 
 // ---------- เหตุการณ์ทางเลือก ----------
+// เงื่อนไขของตัวเลือก: ค่าที่ต้องมีถึงจะเลือกได้ (สเตตัส, level, fame, gold)
+function reqStatus(opt) {
+  if (!opt.req) return [];
+  return Object.entries(opt.req).map(([k, need]) => {
+    const have = k === 'level' ? S.level : k === 'fame' ? Math.round(S.fame) : k === 'gold' ? S.gold : S.stats[k];
+    return { k, need, have, ok: have >= need };
+  });
+}
+const optOpen = opt => reqStatus(opt).every(x => x.ok);
+
 function pickChoice() {
   if (S.age - S.lastChoice < 3) return null;
   const pool = CHOICES.filter(c =>
-    (!c.w || c.w === S.W.id) && S.age >= c.min && S.age <= c.max && !S.used[c.id] && (!c.cond || c.cond(S)));
+    (!c.w || c.w === S.W.id) && S.age >= c.min && S.age <= c.max && !S.used[c.id] && (!c.cond || c.cond(S)) &&
+    (typeof c.opts === 'function' || c.opts.some(optOpen)));
   for (const c of pool.sort(() => rand() - 0.5)) {
     if (chance(c.p)) return c;
   }
@@ -603,11 +614,16 @@ function choiceOpts(c) { return typeof c.opts === 'function' ? c.opts() : c.opts
 
 function applyChoice(c, i) {
   const opt = choiceOpts(c)[i];
+  if (!optOpen(opt)) return null;
   S.used[c.id] = true;
   S.lastChoice = S.age;
   S.ctxCause = 'บาดเจ็บสาหัสจากเหตุการณ์ "' + c.title + '"';
   S.out = [];
+  const before = { ...S.stats };
   const res = opt.fx(S);
+  // สรุปค่าสถานะที่เปลี่ยนจากการเลือกครั้งนี้
+  const diff = STAT_KEYS.filter(k => S.stats[k] !== before[k]).map(k => STAT_NAMES[k] + ' ' + (S.stats[k] > before[k] ? '+' : '−') + Math.abs(S.stats[k] - before[k]));
+  if (diff.length) say((diff.some(d => d.includes('+')) ? '📈 ' : '📉 ') + diff.join(' · '), 'gain');
   S.history.push({ age: S.age, title: c.title, pick: opt.t });
   S.pending = null;
   updateRank(S.rankIdx);

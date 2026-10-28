@@ -267,6 +267,13 @@ body.lock { overflow: hidden; }
 .ch-opts button { text-align: left; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; transition: border-color .15s, transform .15s; }
 .ch-opts button:hover { border-color: var(--gold); transform: translateX(3px); }
 .ch-opts .od { display: block; color: var(--muted); font-size: .82rem; margin-top: 2px; }
+.ch-opts button:disabled { cursor: not-allowed; opacity: .55; border-style: dashed; transform: none; }
+.ch-opts button:disabled:hover { border-color: var(--line); }
+.oreq { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 6px; font-size: .8rem; }
+.oreq i { font-style: normal; padding: 1px 8px; border-radius: 999px; border: 1px solid; }
+.oreq .ok { color: var(--green); border-color: rgba(94,224,160,.35); background: rgba(94,224,160,.06); }
+.oreq .no { color: #ff9a9a; border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.06); }
+.ln-gain { color: var(--green); font-size: .9rem; }
 
 /* ----- จบชีวิต ----- */
 .end-wrap { max-width: 720px; margin: 0 auto; padding-top: 40px; }

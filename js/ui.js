@@ -468,6 +468,17 @@ function step() {
   schedule(quiet ? 0.5 : 1);
 }
 
+const REQ_LABEL = { level: 'เลเวล', fame: 'ชื่อเสียง', gold: 'ทรัพย์' };
+const reqVal = (k, v) => k === 'gold' ? fmtGold(v) : Math.round(v).toLocaleString('th-TH');
+
+// ป้ายเงื่อนไขใต้ตัวเลือก: ✓ ผ่านแล้ว / 🔒 ยังไม่ถึง (บอกค่าที่มีอยู่ด้วย)
+function reqHtml(o) {
+  const rs = reqStatus(o);
+  if (!rs.length) return '';
+  return '<span class="oreq">' + rs.map(x =>
+    `<i class="${x.ok ? 'ok' : 'no'}">${x.ok ? '✓' : '🔒'} ${REQ_LABEL[x.k] || STAT_NAMES[x.k]} ${reqVal(x.k, x.need)}${x.ok ? '' : ` (มี ${reqVal(x.k, x.have)})`}</i>`).join('') + '</span>';
+}
+
 function showChoice(c) {
   clearTimeout(timer);
   const f = $('#yrFill'); f.style.transition = 'none';
@@ -480,10 +491,12 @@ function showChoice(c) {
   $('#chTitle').textContent = c.title;
   $('#chText').textContent = c.text(S);
   $('#chOpts').innerHTML = choiceOpts(c).map((o, i) =>
-    `<button data-i="${i}">${esc(o.t)}${o.d ? `<span class="od">${esc(o.d)}</span>` : ''}</button>`).join('');
+    `<button data-i="${i}" ${optOpen(o) ? '' : 'disabled'}>${esc(o.t)}${o.d ? `<span class="od">${esc(o.d)}</span>` : ''}${reqHtml(o)}</button>`).join('');
   $$('#chOpts button').forEach(b => b.onclick = () => {
     const opt = choiceOpts(c)[+b.dataset.i];
-    const { res, extra } = applyChoice(c, +b.dataset.i);
+    const done = applyChoice(c, +b.dataset.i);
+    if (!done) return;
+    const { res, extra } = done;
     sayLine(curYearEl, '➤ <b>' + esc(c.title) + '</b> — เลือก “' + esc(opt.t) + '”<br>' + esc(res), 'choice');
     extra.forEach(l => sayLine(curYearEl, esc(l.t), l.type));
     $('#choice').classList.add('hidden');

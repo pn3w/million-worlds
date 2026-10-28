@@ -1516,3 +1516,98 @@ const RETIRE_CHOICE = {
     { t: 'ใช้ชีวิตเงียบสงบกับคนที่รัก', d: 'อายุยืนขึ้น', fx: () => { G.mode('retired'); G.S.lifeBonus += 4; return 'คุณใช้ทุกวันที่เหลือไปกับสิ่งที่สำคัญที่สุด'; } },
   ],
 };
+
+// ===== เงื่อนไขของตัวเลือก =====
+// ต้องมีค่าถึงจึงจะเลือกได้: str agi int vit luk cha = ค่าสถานะ, level, fame = ชื่อเสียง, gold = ทรัพย์ (หน่วยก่อนคูณค่าเงินของโลก)
+// ระดับที่ใช้: ราว 10-16 = ค่ารองที่ลงแต้ม/สะสมจากทางเลือกก่อนหน้าก็ถึงได้, 18-26 = ต้องลงทุนจริงจัง, การต่อสู้ใช้ level ให้ทุกอาชีพมีโอกาส
+// ทุกเหตุการณ์ต้องเหลือตัวเลือกที่ไม่มีเงื่อนไขอย่างน้อยหนึ่งตัวเสมอ
+const CHOICE_REQ = {
+  // ทั่วไป
+  elite: { 0: { fame: 40 } },
+  betray: { 0: { str: 20 }, 2: { vit: 20 } },
+  cursed: { 0: { vit: 18 } },
+  office: { 0: { cha: 18 } },
+  disciple: { 0: { int: 15 } },
+  harem_rank: { 1: { cha: 22 } },
+  harem_council: { 1: { gold: 2500 } },
+  harem_gossip: { 0: { fame: 60 } },
+  tw_summon: { 0: { level: 15 } },
+  tw_other: { 1: { level: 15 } },
+  tw_rift: { 0: { level: 35 } },
+  // แฟนตาซี
+  f_bully: { 0: { vit: 10 } },
+  f_rival: { 0: { level: 12 }, 1: { cha: 14 } },
+  f_fest: { 0: { cha: 18 } },
+  f_plague: { 0: { level: 20 }, 1: { int: 14 } },
+  f_mimic: { 1: { agi: 16 } },
+  f_shop: { 0: { int: 15 } },
+  f_deep: { 0: { level: 30 } },
+  f_elf: { 0: { agi: 15 } },
+  // ไซเบอร์
+  fu_bully: { 0: { int: 14 }, 1: { str: 12 } },
+  fu_rival: { 0: { agi: 22 }, 1: { int: 24 } },
+  fu_cup: { 0: { agi: 18 } },
+  fu_fest: { 1: { level: 10 } },
+  fu_plague: { 0: { int: 26 } },
+  fu_clone: { 0: { agi: 18 }, 2: { int: 20 } },
+  fu_colony: { 0: { vit: 18 } },
+  fu_chip: { 0: { vit: 16 } },
+  fu_ai: { 0: { int: 20 } },
+  fu_vr: { 0: { int: 22 } },
+  // หลังวันสิ้นโลก
+  a_bully: { 1: { str: 12 } },
+  a_rival: { 0: { str: 22 }, 1: { cha: 15 } },
+  a_race: { 0: { agi: 18 } },
+  a_fest: { 1: { vit: 14 } },
+  a_fever: { 0: { level: 18 }, 1: { int: 16 } },
+  a_leader: { 0: { cha: 20 } },
+  a_vaccine: { 0: { level: 20 } },
+  a_child: { 0: { gold: 800 } },
+  a_caravan: { 1: { str: 18 } },
+  // ยุคสงคราม
+  w_bully: { 0: { vit: 10 } },
+  w_rival: { 0: { str: 22 } },
+  w_tourney: { 0: { agi: 20 } },
+  w_fest: { 1: { int: 14 } },
+  w_invest: { 1: { gold: 1500 } },
+  w_plague: { 0: { vit: 18 }, 1: { gold: 1500 } },
+  w_village: { 1: { agi: 16 } },
+  w_duel: { 0: { str: 25 } },
+  w_siege: { 0: { vit: 22 }, 1: { cha: 15 } },
+  w_princess: { 0: { cha: 15 } },
+  // มหาสงครามแฟนตาซี
+  fw_bully: { 0: { vit: 10 } },
+  fw_rival: { 0: { agi: 20 }, 1: { cha: 15 } },
+  fw_games: { 0: { str: 20 } },
+  fw_fest: { 1: { cha: 14 } },
+  fw_plague: { 0: { level: 25 }, 1: { int: 18 } },
+  fw_spy: { 0: { agi: 18, level: 20 }, 2: { int: 24 } },
+  fw_peace: { 0: { cha: 22 } },
+  fw_egg: { 0: { cha: 15 } },
+  fw_orc: { 0: { int: 14 } },
+  fw_relic: { 0: { luk: 15 } },
+  // ฮันเตอร์
+  h_bully: { 0: { vit: 10 } },
+  h_rival: { 0: { level: 15 }, 1: { int: 16 } },
+  h_fest: { 1: { level: 12 } },
+  h_plague: { 0: { level: 25 }, 1: { cha: 14 } },
+  h_bts: { 0: { vit: 22 } },
+  h_secret: { 0: { level: 18 } },
+  h_guild: { 1: { cha: 22, fame: 80 } },
+  h_stream: { 0: { cha: 16 } },
+  h_red: { 0: { level: 22 } },
+  // ยุทธภพ
+  x_bully: { 0: { agi: 10 } },
+  x_rival: { 0: { str: 20 }, 1: { gold: 1000 } },
+  x_gather: { 0: { level: 40, fame: 150 } },
+  x_lantern: { 0: { int: 15 } },
+  x_gu: { 0: { level: 25 }, 1: { vit: 20 } },
+  x_fox: { 0: { cha: 12 } },
+  x_cave: { 0: { vit: 20 }, 1: { int: 18 } },
+  x_tourney: { 0: { level: 6 } },
+  x_pill: { 0: { vit: 18 } },
+};
+CHOICES.forEach(c => {
+  const q = CHOICE_REQ[c.id];
+  if (q && Array.isArray(c.opts)) for (const i in q) if (c.opts[i]) c.opts[i].req = q[i];
+});
